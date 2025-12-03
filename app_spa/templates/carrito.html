@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12 text-center mb-5">
+            <h1 class="gradient-text">Tu Carrito de Compras</h1>
+            <p class="text-muted">Revisa y gestiona tus productos y servicios</p>
+        </div>
+    </div>
+
+    {% if items %}
+    <div class="row">
+        <!-- Items del Carrito -->
+        <div class="col-lg-8">
+            <div class="card card-modern">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0">Items en el Carrito</h5>
+                </div>
+                <div class="card-body">
+                    {% for item in items %}
+                    <div class="row align-items-center mb-4 pb-4 border-bottom">
+                        <div class="col-md-2">
+                            {% if item.tipo == 'producto' %}
+                                <img src="{% if item.producto.imagen %}{{ item.producto.imagen.url }}{% else %}https://via.placeholder.com/80x80?text=Producto{% endif %}" 
+                                     class="img-fluid rounded" 
+                                     alt="{{ item.nombre_item }}"
+                                     style="width: 80px; height: 80px; object-fit: cover;">
+                            {% else %}
+                                <img src="{% if item.servicio.imagen %}{{ item.servicio.imagen.url }}{% else %}https://via.placeholder.com/80x80?text=Servicio{% endif %}" 
+                                     class="img-fluid rounded" 
+                                     alt="{{ item.nombre_item }}"
+                                     style="width: 80px; height: 80px; object-fit: cover;">
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <h6 class="mb-1">{{ item.nombre_item }}</h6>
+                            <span class="badge {% if item.tipo == 'producto' %}bg-primary{% else %}bg-success{% endif %}">
+                                {{ item.get_tipo_display }}
+                            </span>
+                            {% if item.tipo == 'producto' %}
+                            <div class="mt-1">
+                                <small class="text-muted">
+                                    Proveedor: {{ item.producto.nombre_proveedor }}
+                                </small>
+                            </div>
+                            {% else %}
+                            <div class="mt-1">
+                                <small class="text-muted">
+                                    Duración: {{ item.servicio.duracion }} min
+                                </small>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <div class="input-group input-group-sm">
+                                <form method="POST" action="{% url 'actualizar_carrito' item.id %}" class="d-flex gap-2">
+                                    {% csrf_token %}
+                                    <input type="number" 
+                                           name="cantidad" 
+                                           value="{{ item.cantidad }}" 
+                                           min="1" 
+                                           {% if item.tipo == 'producto' %}max="{{ item.producto.stock }}"{% else %}max="10"{% endif %}
+                                           class="form-control" 
+                                           style="width: 80px;">
+                                    <button type="submit" class="btn btn-primary-modern btn-sm">
+                                        <i class="bi bi-arrow-clockwise"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-2 text-center">
+                            <strong class="text-primary">${{ item.subtotal|floatformat:2 }}</strong>
+                            <br>
+                            <small class="text-muted">${{ item.precio_unitario|floatformat:2 }} c/u</small>
+                        </div>
+                        
+                        <div class="col-md-1 text-end">
+                            <a href="{% url 'eliminar_carrito' item.id %}" 
+                               class="btn btn-outline-danger btn-sm"
+                               onclick="return confirm('¿Eliminar este item del carrito?')">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Resumen del Pedido CON IVA -->
+        <div class="col-lg-4">
+            <div class="card card-modern sticky-top" style="top: 2rem;">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0">Resumen del Pedido</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Subtotal -->
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal ({{ carrito.total_items }} items)</span>
+                        <span>${{ subtotal|floatformat:2 }}</span>
+                    </div>
+                    
+                    <!-- IVA del 8% -->
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>IVA (8%)</span>
+                        <span class="text-info">${{ iva|floatformat:2 }}</span>
+                    </div>
+                    
+                    <!-- Servicios (si aplica) -->
+                    {% if carrito.tiene_servicios %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Reservación servicios</span>
+                        <span class="text-success">Incluido</span>
+                    </div>
+                    {% endif %}
+                    
+                    
+                    
+                    <hr>
+                    
+                    <!-- Total con IVA -->
+                    <div class="d-flex justify-content-between mb-3">
+                        <strong class="h5">Total con IVA</strong>
+                        <strong class="text-primary h4">${{ total_con_iva|floatformat:2 }}</strong>
+                    </div>
+                    
+                    <!-- Nota del IVA -->
+                    <div class="alert alert-info bg-light border-0 py-2 px-3 mb-4">
+                        <small class="d-flex align-items-center">
+                            <i class="bi bi-info-circle me-2"></i>
+                            * Incluye IVA del 8% aplicado al subtotal
+                        </small>
+                    </div>
+            
+                    <a href="{% url 'checkout' %}" class="btn btn-primary-modern w-100 mb-3 py-3">
+                        <i class="bi bi-bag-check"></i> 
+                        {{ texto_boton }}
+                    </a>
+                    
+                    <!-- Botones adicionales -->
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'tienda' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-bag"></i> Seguir Comprando Productos
+                        </a>
+                        
+                        {% if user.is_staff %}
+                        <a href="{% url 'servicios_lista' %}" class="btn btn-outline-success">
+                            <i class="bi bi-scissors"></i> Ver Servicios
+                        </a>
+                        {% else %}
+                        <a href="{% url 'inicio' %}" class="btn btn-outline-success">
+                            <i class="bi bi-scissors"></i> Ver Más Servicios
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- Carrito Vacío -->
+    <div class="row">
+        <div class="col-12 text-center py-5">
+            <div class="card card-modern">
+                <div class="card-body py-5">
+                    <i class="bi bi-cart-x display-1 text-muted mb-3"></i>
+                    <h3 class="text-muted">Tu carrito está vacío</h3>
+                    <p class="text-muted mb-4">Agrega algunos productos o servicios para continuar</p>
+                    <div class="d-flex gap-2 justify-content-center">
+                        <a href="{% url 'tienda' %}" class="btn btn-primary-modern">
+                            <i class="bi bi-bag"></i> Explorar Productos
+                        </a>
+                        <a href="{% url 'inicio' %}" class="btn btn-success">
+                            <i class="bi bi-scissors"></i> Ver Servicios
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

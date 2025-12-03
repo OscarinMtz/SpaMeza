@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card card-modern">
+                <div class="card-header bg-transparent text-center">
+                    <h3 class="text-warning mb-0">Cancelar Pedido</h3>
+                </div>
+                <div class="card-body text-center">
+                    <i class="bi bi-x-circle display-1 text-warning mb-3"></i>
+                    
+                    <h4>¿Estás seguro de cancelar este pedido?</h4>
+                    
+                    <div class="card bg-light mt-4">
+                        <div class="card-body text-start">
+                            <h5 class="card-title">Pedido #{{ pedido.id }}</h5>
+                            <p class="card-text">
+                                <strong>Fecha:</strong> {{ pedido.fecha_pedido|date:"d M Y H:i" }}<br>
+                                <strong>Total:</strong> ${{ pedido.total }}<br>
+                                <strong>Estado actual:</strong> 
+                                <span class="badge {% if pedido.estado == 'completado' %}bg-success{% elif pedido.estado == 'pendiente' %}bg-warning{% elif pedido.estado == 'confirmado' %}bg-primary{% else %}bg-danger{% endif %}">
+                                    {{ pedido.get_estado_display }}
+                                </span><br>
+                                <strong>Items:</strong> {{ pedido.items.count }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- CORREGIDO: Cambiar la condición -->
+                    {% if pedido.estado != 'pendiente' and pedido.estado != 'confirmado' %}
+                    <div class="alert alert-warning mt-3">
+                        <strong>Advertencia:</strong> Solo se pueden cancelar pedidos en estado "Pendiente" o "Confirmado".
+                    </div>
+                    {% endif %}
+
+                    <div class="alert alert-info mt-3">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Nota:</strong> Al cancelar, los productos volverán al stock disponible y el pedido se marcará como "Cancelado".
+                    </div>
+
+                    <form method="POST" class="mt-4">
+                        {% csrf_token %}
+                        <div class="d-flex gap-2 justify-content-center">
+                            <!-- CORREGIDO: Cambiar la condición -->
+                            {% if pedido.estado == 'pendiente' or pedido.estado == 'confirmado' %}
+                            <button type="submit" class="btn btn-warning btn-lg">
+                                <i class="bi bi-x-circle"></i> Sí, Cancelar Pedido
+                            </button>
+                            {% endif %}
+                            <a href="{% url 'mis_pedidos' %}" class="btn btn-secondary btn-lg">
+                                <i class="bi bi-arrow-left"></i> Volver
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,95 @@
+}{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card card-modern">
+                <div class="card-header bg-transparent">
+                    <h3 class="gradient-text mb-0">Agregar Nuevo Producto</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Nombre del Producto</label>
+                            <input type="text" class="form-control" name="nombre" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Descripción</label>
+                            <textarea class="form-control" name="descripcion" rows="3" placeholder="Describe el producto..."></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Precio ($)</label>
+                                <input type="number" step="0.01" class="form-control" name="precio" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Stock</label>
+                                <input type="number" class="form-control" name="stock" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Tipo de Producto</label>
+                                <select class="form-select" name="tipo_producto" required>
+                                    <option value="">Selecciona el tipo</option>
+                                    <option value="cosmetico">Cosmético</option>
+                                    <option value="equipo">Equipo</option>
+                                    <option value="material">Material</option>
+                                    <option value="herramienta">Herramienta</option>
+                                    <option value="otros">Otros</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Proveedor</label>
+                                <select class="form-select" name="proveedor" required>
+                                    <option value="">Selecciona un proveedor</option>
+                                    {% for proveedor in proveedores %}
+                                    <option value="{{ proveedor.id_proveedores }}">{{ proveedor.nombre_empresa }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Servicios que usan este producto</label>
+                            <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                                {% for servicio in servicios %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="servicios" 
+                                           value="{{ servicio.id_servicios }}" id="servicio{{ servicio.id_servicios }}">
+                                    <label class="form-check-label" for="servicio{{ servicio.id_servicios }}">
+                                        {{ servicio.nombre }}
+                                    </label>
+                                </div>
+                                {% empty %}
+                                <p class="text-muted">No hay servicios disponibles</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Imagen del Producto</label>
+                            <input type="file" class="form-control" name="imagen" accept="image/*">
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary-modern">
+                                <i class="bi bi-check-circle"></i> Guardar Producto
+                            </button>
+                            <a href="{% url 'productos_lista' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="gradient-text">Gestión de Servicios</h1>
+            <p class="text-muted">Administra los servicios del spa</p>
+        </div>
+        <a href="{% url 'servicio_agregar' %}" class="btn btn-primary-modern">
+            <i class="bi bi-plus-circle"></i> Agregar Servicio
+        </a>
+    </div>
+
+    <div class="card card-modern">
+        <div class="card-body">
+            {% if servicios %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Imagen</th>
+                            <th>Nombre</th>
+                            <th>Precio</th>
+                            <th>Duración</th>
+                            <th>Tipo</th>
+                            <th>Productos Utilizados</th>
+                            <th>Empleados</th>
+                            <th>Clientes</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for servicio in servicios %}
+                        <tr>
+                            <td><strong>#{{ servicio.id_servicios }}</strong></td>
+                            <td>
+                                {% if servicio.imagen %}
+                                <img src="{{ servicio.imagen.url }}" 
+                                     class="rounded" 
+                                     style="width: 60px; height: 60px; object-fit: cover;"
+                                     alt="{{ servicio.nombre }}">
+                                {% else %}
+                                <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                     style="width: 60px; height: 60px;">
+                                    <i class="bi bi-image text-muted"></i>
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong>{{ servicio.nombre }}</strong>
+                                {% if servicio.descripcion %}
+                                <br>
+                                <small class="text-muted">{{ servicio.descripcion|truncatewords:8 }}</small>
+                                {% endif %}
+                            </td>
+                            <td>${{ servicio.precio }}</td>
+                            <td>{{ servicio.duracion }} min</td>
+                            <td>
+                                <span class="badge badge-modern">{{ servicio.tipo_servicio }}</span>
+                            </td>
+                            <td>
+                                {% if servicio.productos_utilizados.all %}
+                                <div class="productos-lista">
+                                    {% for producto in servicio.productos_utilizados.all %}
+                                    <div class="d-flex align-items-center mb-1">
+                                        {% if producto.imagen %}
+                                        <img src="{{ producto.imagen.url }}" 
+                                             class="rounded me-2" 
+                                             style="width: 30px; height: 30px; object-fit: cover;"
+                                             alt="{{ producto.nombre }}"
+                                             title="{{ producto.nombre }}">
+                                        {% else %}
+                                        <div class="bg-light rounded d-flex align-items-center justify-content-center me-2" 
+                                             style="width: 30px; height: 30px;">
+                                            <i class="bi bi-box text-muted" style="font-size: 0.8rem;"></i>
+                                        </div>
+                                        {% endif %}
+                                        <div>
+                                            <small class="d-block">{{ producto.nombre }}</small>
+                                            <small class="text-muted">${{ producto.precio }}</small>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                    <small class="text-success">
+                                        <i class="bi bi-check-circle"></i> 
+                                        {{ servicio.total_productos_utilizados }} producto(s)
+                                    </small>
+                                </div>
+                                {% else %}
+                                <small class="text-muted">Sin productos asignados</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <small>{{ servicio.empleados_asignados|default:"Sin empleados" }}</small>
+                            </td>
+                            <td>
+                                <small>{{ servicio.clientes_asignados|default:"Sin clientes" }}</small>
+                            </td>
+                            <td>
+                                {% if user.is_authenticated and not user.is_staff %}
+                                <a href="{% url 'agregar_servicio_carrito' servicio.id_servicios %}" 
+                                   class="btn btn-success btn-sm"
+                                   title="Agregar al carrito">
+                                    <i class="bi bi-cart-plus"></i>
+                                </a>
+                                {% elif not user.is_authenticated %}
+                                <a href="{% url 'login' %}" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-box-arrow-in-right"></i>
+                                </a>
+                                {% else %}
+                                <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user.is_staff %}
+                                <div class="btn-group">
+                                    <a href="{% url 'servicio_editar' servicio.id_servicios %}" 
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'servicio_eliminar' servicio.id_servicios %}" 
+                                       class="btn btn-outline-danger btn-sm">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                                {% else %}
+                                <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-scissors display-1 text-muted mb-3"></i>
+                <h4 class="text-muted">No hay servicios registrados</h4>
+                <p class="text-muted">Comienza agregando el primer servicio</p>
+                <a href="{% url 'servicio_agregar' %}" class="btn btn-primary-modern">
+                    Agregar Primer Servicio
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.productos-lista {
+    max-height: 120px;
+    overflow-y: auto;
+}
+.productos-lista::-webkit-scrollbar {
+    width: 4px;
+}
+.productos-lista::-webkit-scrollbar-thumb {
+    background-color: #02D608;
+    border-radius: 10px;
+}
+</style>
+{% endblock %}

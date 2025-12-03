@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="gradient-text">Gestión de Clientes</h1>
+            <p class="text-muted">Administra los clientes del spa</p>
+        </div>
+        <a href="{% url 'cliente_agregar' %}" class="btn btn-primary-modern">
+            <i class="bi bi-person-plus"></i> Agregar Cliente
+        </a>
+    </div>
+
+    <div class="card card-modern">
+        <div class="card-body">
+            {% if clientes %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Fecha Registro</th>
+                            <th>Servicios Contratados</th>
+                            <th>Productos de Interés</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cliente in clientes %}
+                        <tr>
+                            <td><strong>#{{ cliente.id_clientes }}</strong></td>
+                            <td>
+                                <h6 class="mb-0">{{ cliente.nombre_completo }}</h6>
+                                {% if cliente.alergias %}
+                                <small class="text-danger">⚠️ Alergias</small>
+                                {% endif %}
+                            </td>
+                            <td>{{ cliente.email }}</td>
+                            <td>{{ cliente.telefono }}</td>
+                            <td>{{ cliente.fecha_registro }}</td>
+                            <td>
+                                <small>{{ cliente.servicios_contratados|default:"Sin servicios" }}</small>
+                            </td>
+                            <td>
+                                <small>{{ cliente.productos_interes_nombres|default:"Sin productos" }}</small>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{% url 'cliente_editar' cliente.id_clientes %}" 
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'cliente_eliminar' cliente.id_clientes %}" 
+                                       class="btn btn-outline-danger btn-sm">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-people display-1 text-muted mb-3"></i>
+                <h4 class="text-muted">No hay clientes registrados</h4>
+                <p class="text-muted">Comienza agregando el primer cliente</p>
+                <a href="{% url 'cliente_agregar' %}" class="btn btn-primary-modern">
+                    Agregar Primer Cliente
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

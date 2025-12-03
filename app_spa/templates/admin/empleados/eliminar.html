@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card card-modern">
+                <div class="card-header bg-transparent text-center">
+                    <h3 class="text-danger mb-0">Eliminar Empleado</h3>
+                </div>
+                <div class="card-body text-center">
+                    <i class="bi bi-person-x display-1 text-warning mb-3"></i>
+                    
+                    <h4>¿Estás seguro de eliminar este empleado?</h4>
+                    
+                    <div class="card bg-light mt-4">
+                        <div class="card-body text-start">
+                            <h5 class="card-title">{{ empleado.nombre }} {{ empleado.apellido }}</h5>
+                            <p class="card-text">
+                                <strong>Especialidad:</strong> {{ empleado.especialidad }}<br>
+                                <strong>Cargo:</strong> {{ empleado.cargo }}<br>
+                                <strong>Teléfono:</strong> {{ empleado.telefono }}<br>
+                                <strong>Servicio:</strong> {{ empleado.servicio.nombre }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <form method="POST" class="mt-4">
+                        {% csrf_token %}
+                        <div class="d-flex gap-2 justify-content-center">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Sí, Eliminar
+                            </button>
+                            <a href="{% url 'empleados_lista' %}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

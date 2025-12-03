@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card card-modern">
+                <div class="card-header bg-transparent">
+                    <h3 class="gradient-text mb-0">Agregar Nuevo Empleado</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nombre</label>
+                                <input type="text" class="form-control" name="nombre" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Apellido</label>
+                                <input type="text" class="form-control" name="apellido" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Especialidad</label>
+                                <input type="text" class="form-control" name="especialidad" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Teléfono</label>
+                                <input type="text" class="form-control" name="telefono" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Cargo</label>
+                            <input type="text" class="form-control" name="cargo" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Servicio Asignado</label>
+                            <select class="form-select" name="servicio" required>
+                                <option value="">Selecciona un servicio</option>
+                                {% for servicio in servicios %}
+                                <option value="{{ servicio.id_servicios }}">{{ servicio.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary-modern">
+                                <i class="bi bi-check-circle"></i> Guardar Empleado
+                            </button>
+                            <a href="{% url 'empleados_lista' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
